@@ -1,0 +1,67 @@
+---
+- name: App into maintenance mode
+  shell: php {{ root_folder }}/artisan down
+  tags:
+    - sync
+  when: isFirstRun is not defined
+
+- name: Sync site
+  synchronize:
+    src: ../../../../www/
+    dest: "{{ root_folder }}"
+    rsync_opts:
+      --exclude=.DS_Store,
+      --exclude=.git,
+      --exclude=node_modules,
+      --exclude=vendor,
+      --exclude=.env,
+      --exclude=.env.production,
+      --exclude=storage/framework/views/*,
+      --exclude=storage/logs/*,
+      --exclude=bootstrap/cache/*
+  tags:
+    - sync
+
+- name: Copy .env.production to production .env
+  copy:
+    src: ../../../../www/.env.production
+    dest: "{{ root_folder }}/.env"
+  tags:
+    - sync
+
+- name: Composer install
+  composer:
+    command: install
+    working_dir: "{{ root_folder }}"
+  tags:
+    - sync
+
+- name: Ensure directories are 0755
+  file:
+    path: "{{ root_folder }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    recurse: yes
+    mode: 0755
+  tags:
+    - permissions
+    - sync
+
+- name: Ensure files are 0644
+  command: find {{ root_folder }} -type f -exec chmod 0644 {} \;
+  tags:
+    - permissions
+    - sync
+
+- name: Clear app cache
+  shell: php {{ root_folder }}/artisan cache:clear
+  tags:
+    - sync
+  when: isFirstRun is not defined
+
+- name: App out of maintenance mode
+  shell: php {{ root_folder }}/artisan up
+  tags:
+    - sync
+  when: isFirstRun is not defined

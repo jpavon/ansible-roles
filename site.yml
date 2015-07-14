@@ -1,0 +1,15 @@
+- hosts: production
+  roles:
+    - { role: base }
+    - { role: php-fpm }
+    - { role: nginx }
+    - { role: composer }
+    - { role: mysql }
+    - { role: memcached }
+    - { role: ufw }
+    - { role: fail2ban }
+    - { role: logwatch }
+    - { role: swapfile }
+    - { role: sync }
+    - { role: cron }
+    - { role: newrelic }

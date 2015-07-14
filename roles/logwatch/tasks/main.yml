@@ -1,0 +1,26 @@
+---
+- name: Logwatch | Make sure logwatch and its dependencies are installed
+  apt:
+    pkg: "{{item}}"
+    state: present
+  with_items:
+    - logwatch
+
+- name: Logwatch | Configure logwatch (/etc/logwatch/conf/logwatch.conf)
+  template:
+    src: logwatch.conf.j2
+    dest: /etc/logwatch/conf/logwatch.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Logwatch | Remove logwatch's cronjob
+  file:
+    path: /etc/cron.daily/00logwatch
+    state: absent
+
+- name: Logwatch | Configure logwatch's cronjob
+  cron:
+    name: logwatch
+    job: /usr/sbin/logwatch
+    special_time: daily

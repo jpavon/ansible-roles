@@ -1,0 +1,7 @@
+---
+- name: Add cron for laravel scheduler
+  cron:
+    name: "Add cron for laravel scheduler"
+    job: "php {{ root_folder }}/artisan schedule:run 1>> /dev/null 2>&1"
+  tags:
+    - cron

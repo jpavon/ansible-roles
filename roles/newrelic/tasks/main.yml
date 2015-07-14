@@ -1,0 +1,64 @@
+---
+
+# New Relic for PHP
+#
+- name: Installing dependencies
+  apt:
+    pkg: apt-transport-https
+    state: present
+
+- name: Adding APT key
+  apt_key:
+    url: https://download.newrelic.com/548C16BF.gpg
+
+- name: Add APT repository
+  apt_repository:
+    repo: "deb http://apt.newrelic.com/debian/ newrelic non-free"
+
+- name: Installing packages
+  apt:
+    pkg: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - newrelic-php5
+
+- name: Configuring module
+  template:
+    src: "newrelic.ini.j2"
+    dest: "/etc/php5/mods-available/newrelic.ini"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Restart PHP-FPM
+  shell: service php5-fpm restart
+
+
+# New Relic for the Server
+#
+- name: Debian | Install New Relic Sysmond
+  apt:
+    pkg: newrelic-sysmond
+    update_cache: true
+    cache_valid_time: 86400
+    state: latest
+
+- name: Configure New Relic Sysmond
+  template:
+    src: nrsysmond.cfg.j2
+    dest: /etc/newrelic/nrsysmond.cfg
+    group: newrelic
+    owner: root
+    mode: 0640
+
+- name: Restart New Relic
+  service:
+    name: newrelic-sysmond
+    state: restarted
+
+- name: Ensure New Relic Sysmond is started and enabled
+  service:
+    name: newrelic-sysmond
+    state: started
+    enabled: yes

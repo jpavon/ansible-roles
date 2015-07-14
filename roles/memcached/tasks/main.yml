@@ -1,0 +1,6 @@
+---
+- name: Install memcached server
+  apt:
+    pkg: memcached
+    state: installed
+    update_cache: yes

@@ -1,0 +1,84 @@
+---
+- name: Add Nginx Repository
+  apt_repository:
+    repo: 'ppa:nginx/stable'
+    state: present
+
+- name: Install Nginx
+  apt:
+    pkg: nginx
+    state: installed
+    update_cache: yes
+  notify:
+    - Start Nginx
+
+- name: Add Nginx Config
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  tags:
+    - vhost
+
+- name: Add Nginx Mime Types
+  template:
+    src: mime.types.j2
+    dest: /etc/nginx/mime.types
+  tags:
+    - vhost
+
+- name: Disable Default Site
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+  tags:
+    - vhost
+
+- name: Copy ssl .crt file
+  copy:
+    src: ssl.crt
+    dest: /etc/nginx/ssl.crt
+  tags:
+    - vhost
+
+- name: Copy ssl .key file
+  copy:
+    src: ssl.key
+    dest: /etc/nginx/ssl.key
+  tags:
+    - vhost
+
+- name: Copy ssl dhparam.pem file
+  copy:
+    src: dhparam.pem
+    dest: /etc/nginx/dhparam.pem
+  tags:
+    - vhost
+
+- name: Copy ssl trusted-ssl-bundle.crt file
+  copy:
+    src: trusted-ssl-bundle.crt
+    dest: /etc/nginx/trusted-ssl-bundle.crt
+  tags:
+    - vhost
+
+- name: Add Site Config
+  template:
+    src: site.conf.j2
+    dest: /etc/nginx/sites-available/all.conf
+  tags:
+    - vhost
+
+- name: Enable Site Config
+  file:
+    src: /etc/nginx/sites-available/all.conf
+    dest: /etc/nginx/sites-enabled/all.conf
+    state: link
+  tags:
+    - vhost
+
+- name: Ensure Nginx is restarted
+  command: /bin/true
+  tags:
+    - vhost
+  notify:
+    - Reload Nginx

@@ -1,0 +1,41 @@
+---
+root_folder: /var/www/example.com
+domain: example.com
+timezone: 'Europe/Madrid'
+
+# Mysql
+#
+db_password: 12345
+db_name: dbname
+
+# Logwatch
+#
+logwatch_email: test@example.com
+
+# Newrelic
+#
+newrelic_license_key: key
+# PHP
+php5_newrelic_appname: App Name
+php5_newrelic_logfile: /var/log/newrelic/php_agent.log
+php5_newrelic_loglevel: info
+php5_newrelic_daemon_logfile: /var/log/newrelic/newrelic-daemon.log
+php5_newrelic_daemon_loglevel: info
+php5_newrelic_high_security: false
+# Server
+newrelic_loglevel: info
+newrelic_logfile: /var/log/newrelic/nrsysmond.log
+newrelic_proxy: False
+newrelic_ssl: "false"
+newrelic_ssl_ca_bundle: False
+newrelic_ssl_ca_path: False
+newrelic_pidfile: /var/run/newrelic/nrsysmond.pid
+newrelic_collector_host: collector.newrelic.com
+newrelic_timeout: 30
+
+# Swapfile
+#
+swapfile_location: /swapfile
+swapfile_size: 512MB
+swapfile_swappiness: 10
+swapfile_vfs_cache_pressure: 50

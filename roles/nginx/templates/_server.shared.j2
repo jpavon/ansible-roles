@@ -1,0 +1,42 @@
+charset utf-8;
+
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
+
+if (!-d $request_filename) {
+    rewrite ^/(.+)/$ /$1 permanent;
+}
+
+location = /favicon.ico { log_not_found off; access_log off; }
+location = /robots.txt  { access_log off; log_not_found off; }
+
+error_page 404 /index.php;
+
+location ~ ^/index\.php(/|$) {
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_index index.php;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+}
+
+location ~* (?:^|/)\. {
+    deny all;
+}
+
+location ~* (?:\.(?:bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist)|~)$ {
+    deny all;
+}
+
+location ~* \.(?:css|js)$ {
+    expires 1y;
+    access_log off;
+    add_header Cache-Control "public";
+}
+
+location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+    expires 30d;
+    access_log off;
+    add_header Cache-Control "public";
+}

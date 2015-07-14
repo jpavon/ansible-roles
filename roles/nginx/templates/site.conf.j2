@@ -1,0 +1,42 @@
+server {
+    listen [::]:80 default_server;
+    listen 80 default_server;
+
+    root {{ root_folder}}/public;
+    index index.html index.htm index.php;
+
+    server_name _;
+
+    {% include '_server.shared.j2' %}
+}
+server {
+    listen [::]:80;
+    listen 80;
+
+    server_name {{ domain }} www.{{ domain }};
+    return 301 https://www.{{ domain }}$request_uri;
+}
+
+server {
+    listen [::]:443 ssl spdy;
+    listen 443 ssl spdy;
+
+    server_name {{ domain }};
+
+    {% include '_ssl.j2' %}
+
+    return 301 $scheme://www.{{ domain }}$request_uri;
+}
+server {
+    listen [::]:443 ssl spdy;
+    listen 443 ssl spdy;
+
+    root {{ root_folder}}/public;
+    index index.html index.htm index.php;
+
+    server_name www.{{ domain }};
+
+    {% include '_ssl.j2' %}
+
+    {% include '_server.shared.j2' %}
+}
